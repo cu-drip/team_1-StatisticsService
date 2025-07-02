@@ -1,0 +1,2 @@
+# StatisticsService
+Реализация микросервиса StatisticsService 
