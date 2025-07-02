@@ -1,0 +1,205 @@
+openapi: 3.0.3
+info:
+  title: StatisticsService API
+  version: 1.0.0
+  description: >
+    Микросервис для агрегации результатов матчей, индивидуальной и командной статистики,
+    построения отчётов по турнирам и визуализации данных.
+
+servers:
+  - url: http://localhost:8081
+
+paths:
+  /api/stats/player/{userId}:
+    get:
+      summary: Получить индивидуальную статистику участника
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Статистика игрока
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerStats'
+
+  /api/stats/team/{teamId}:
+    get:
+      summary: Получить агрегированную статистику команды
+      parameters:
+        - in: path
+          name: teamId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Статистика команды
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamStats'
+
+  /api/stats/tournament/{tournamentId}:
+    get:
+      summary: Получить статистику по турниру
+      parameters:
+        - in: path
+          name: tournamentId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Разбивка по этапам турнира
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TournamentStats'
+
+  /api/stats/top/players:
+    get:
+      summary: Получить топ-5 игроков по среднему количеству очков
+      parameters:
+        - in: query
+          name: sport
+          required: true
+          schema:
+            type: string
+            enum: [football, boxing, basketball, chess, tennis, jiu jitsu]
+      responses:
+        '200':
+          description: Список лучших игроков
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PlayerStats'
+
+  /api/stats/visual/team/{teamId}:
+    get:
+      summary: Получить данные для визуализации статистики команды
+      parameters:
+        - in: path
+          name: teamId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: JSON-данные для построения графиков
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisualizationData'
+
+components:
+  schemas:
+    PlayerStats:
+      type: object
+      properties:
+        userId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        surname:
+          type: string
+        totalGames:
+          type: integer
+        totalPoints:
+          type: integer
+        averagePoints:
+          type: number
+          format: float
+        totalWins:
+          type: integer
+
+    TeamStats:
+      type: object
+      properties:
+        teamId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        gamesPlayed:
+          type: integer
+        averagePoints:
+          type: number
+          format: float
+        totalWins:
+          type: integer
+        topPlayers:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlayerStats'
+
+    TournamentStats:
+      type: object
+      properties:
+        tournamentId:
+          type: string
+          format: uuid
+        title:
+          type: string
+        sport:
+          type: string
+        stages:
+          type: array
+          items:
+            $ref: '#/components/schemas/TournamentStage'
+
+    TournamentStage:
+      type: object
+      properties:
+        stageName:
+          type: string
+        matches:
+          type: array
+          items:
+            $ref: '#/components/schemas/MatchResult'
+
+    MatchResult:
+      type: object
+      properties:
+        matchId:
+          type: string
+          format: uuid
+        startedAt:
+          type: string
+          format: date-time
+        partition1Id:
+          type: string
+          format: uuid
+        partition2Id:
+          type: string
+          format: uuid
+        partition1Points:
+          type: integer
+        partition2Points:
+          type: integer
+        winnerId:
+          type: string
+          format: uuid
+
+    VisualizationData:
+      type: object
+      properties:
+        labels:
+          type: array
+          items:
+            type: string
+        values:
+          type: array
+          items:
+            type: number
