@@ -7,10 +7,10 @@ info:
     построения отчётов по турнирам и визуализации данных.
 
 servers:
-  - url: http://localhost:8081
+  - url: http://localhost:8081/api/v1
 
 paths:
-  /api/stats/player/{userId}:
+  /stats/player/{userId}:
     get:
       summary: Получить индивидуальную статистику участника
       parameters:
@@ -28,7 +28,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PlayerStats'
 
-  /api/stats/team/{teamId}:
+  /stats/team/{teamId}:
     get:
       summary: Получить агрегированную статистику команды
       parameters:
@@ -46,7 +46,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/TeamStats'
 
-  /api/stats/tournament/{tournamentId}:
+  /stats/tournament/{tournamentId}:
     get:
       summary: Получить статистику по турниру
       parameters:
@@ -64,7 +64,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/TournamentStats'
 
-  /api/stats/top/players:
+  /stats/top/players:
     get:
       summary: Получить топ-5 игроков по среднему количеству очков
       parameters:
@@ -84,7 +84,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/PlayerStats'
 
-  /api/stats/visual/team/{teamId}:
+  /stats/visual/team/{teamId}:
     get:
       summary: Получить данные для визуализации статистики команды
       parameters:
@@ -203,3 +203,4 @@ components:
           type: array
           items:
             type: number
+
