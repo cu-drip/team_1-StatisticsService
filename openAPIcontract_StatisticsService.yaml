@@ -20,6 +20,11 @@ paths:
           schema:
             type: string
             format: uuid
+         - in: query  # Добавлен параметр для фильтрации по виду спорта
+          name: sport
+          schema:
+            type: string
+            enum: [football, boxing, basketball, chess, tennis, jiu_jitsu]
       responses:
         '200':
           description: Статистика игрока
@@ -101,6 +106,77 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VisualizationData'
+   /stats/matches/history:
+    get:
+      summary: Получить историю матчей с фильтрами
+      parameters:
+        - in: query
+          name: player_id
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: team_id
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: tournament_id
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: sport
+          schema:
+            type: string
+            enum: [football, boxing, basketball, chess, tennis, jiu_jitsu]
+      responses:
+        '200':
+          description: Список матчей с результатами
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExtendedMatchResult'
+
+  /stats/aggregate/players:
+    get:
+      summary: Агрегированная статистика всех игроков
+      parameters:
+        - in: query
+          name: sport
+          required: true
+          schema:
+            type: string
+            enum: [football, boxing, basketball, chess, tennis, jiu_jitsu]
+      responses:
+        '200':
+          description: Список игроков с статистикой
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PlayerStats'
+
+  /stats/tournament/{tournamentId}/stages:
+    get:
+      summary: Получить детализацию стадий турнира
+      parameters:
+        - in: path
+          name: tournamentId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Полная сетка турнира
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TournamentStages'
 
 components:
   schemas:
@@ -203,4 +279,76 @@ components:
           type: array
           items:
             type: number
+
+    # Существующие схемы остаются
+    # Добавлены новые:
+    
+    ExtendedMatchResult:
+      type: object
+      properties:
+        matchId:
+          type: string
+          format: uuid
+        tournamentId:
+          type: string
+          format: uuid
+        tournamentTitle:
+          type: string
+        sport:
+          type: string
+          enum: [football, boxing, basketball, chess, tennis, jiu_jitsu]
+        startedAt:
+          type: string
+          format: date-time
+        endedAt:
+          type: string
+          format: date-time
+        participants:
+          type: array
+          items:
+            $ref: '#/components/schemas/MatchParticipant'
+        events:  # Для детализации (голы, фолы и т.д.)
+          type: array
+          items:
+            $ref: '#/components/schemas/MatchEvent'
+
+    MatchParticipant:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [player, team]
+        name:
+          type: string
+        points:
+          type: integer
+        isWinner:
+          type: boolean
+
+    TournamentStages:
+      type: object
+      properties:
+        tournamentId:
+          type: string
+          format: uuid
+        stages:
+          type: array
+          items:
+            $ref: '#/components/schemas/TournamentStageDetails'
+
+    TournamentStageDetails:
+      type: object
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+          enum: [group, playoff, round_robin]
+        matches:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExtendedMatchResult'
 
