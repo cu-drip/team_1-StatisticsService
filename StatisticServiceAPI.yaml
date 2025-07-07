@@ -1,0 +1,209 @@
+openapi: 3.0.3
+info:
+  title: StatisticsService API
+  version: 1.0.0
+  description: >
+    MVP-версия микросервиса статистики. Принимает результаты матчей,
+    предоставляет базовую индивидуальную и командную статистику.
+
+servers:
+  - url: http://localhost:8081/api/v1
+
+paths:
+  /stats/update:
+    post:
+      summary: Сохранить результат матча
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExtendedMatchResult'
+      responses:
+        '200':
+          description: Результат сохранён
+
+  /stats/player/{userId}:
+    get:
+      summary: Получить индивидуальную статистику игрока
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Статистика игрока
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerStats'
+
+  /stats/team/{teamId}:
+    get:
+      summary: Получить статистику команды
+      parameters:
+        - in: path
+          name: teamId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Статистика команды
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamStats'
+
+  /stats/top/players:
+    get:
+      summary: Получить топ-5 игроков по очкам
+      parameters:
+        - in: query
+          name: sport
+          required: true
+          schema:
+            type: string
+            enum: [football, boxing, basketball, chess, tennis, jiu_jitsu]
+      responses:
+        '200':
+          description: Список топ-игроков
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PlayerStats'
+
+  /stats/matches/history:
+    get:
+      summary: Получить историю матчей
+      parameters:
+        - in: query
+          name: player_id
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: team_id
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: tournament_id
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: sport
+          schema:
+            type: string
+            enum: [football, boxing, basketball, chess, tennis, jiu_jitsu]
+      responses:
+        '200':
+          description: Список матчей
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MatchSummary'
+
+components:
+  schemas:
+
+    PlayerStats:
+      type: object
+      properties:
+        userId:
+          type: string
+          format: uuid
+        totalGames:
+          type: integer
+        totalPoints:
+          type: integer
+        averagePoints:
+          type: number
+          format: float
+        totalWins:
+          type: integer
+
+    TeamStats:
+      type: object
+      properties:
+        teamId:
+          type: string
+          format: uuid
+        totalGames:
+          type: integer
+        totalPoints:
+          type: integer
+        averagePoints:
+          type: number
+          format: float
+        totalWins:
+          type: integer
+
+    MatchSummary:
+      type: object
+      properties:
+        matchId:
+          type: string
+          format: uuid
+        startedAt:
+          type: string
+          format: date-time
+        endedAt:
+          type: string
+          format: date-time
+        sport:
+          type: string
+        participants:
+          type: array
+          items:
+            $ref: '#/components/schemas/MatchParticipant'
+
+    ExtendedMatchResult:
+      type: object
+      properties:
+        matchId:
+          type: string
+          format: uuid
+        tournamentId:
+          type: string
+          format: uuid
+        tournamentTitle:
+          type: string
+        sport:
+          type: string
+          enum: [football, boxing, basketball, chess, tennis, jiu_jitsu]
+        startedAt:
+          type: string
+          format: date-time
+        endedAt:
+          type: string
+          format: date-time
+        participants:
+          type: array
+          items:
+            $ref: '#/components/schemas/MatchParticipant'
+
+    MatchParticipant:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [player, team]
+        name:
+          type: string
+        points:
+          type: integer
+        isWinner:
+          type: boolean
