@@ -3,8 +3,8 @@ info:
   title: StatisticsService API
   version: 1.0.0
   description: >
-    MVP-версия микросервиса статистики. Принимает результаты матчей,
-    предоставляет базовую индивидуальную и командную статистику.
+    MVP версия сервиса статистики. Обеспечивает приём данных матчей,
+    индивидуальную и командную статистику, историю матчей и топ игроков.
 
 servers:
   - url: http://localhost:8081/api/v1
@@ -12,16 +12,16 @@ servers:
 paths:
   /stats/update:
     post:
-      summary: Сохранить результат матча
+      summary: Массовая передача результатов матчей
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ExtendedMatchResult'
+              $ref: '#/components/schemas/BatchMatchStatsRequest'
       responses:
         '200':
-          description: Результат сохранён
+          description: Данные успешно сохранены
 
   /stats/player/{userId}:
     get:
@@ -84,17 +84,7 @@ paths:
       summary: Получить историю матчей
       parameters:
         - in: query
-          name: player_id
-          schema:
-            type: string
-            format: uuid
-        - in: query
-          name: team_id
-          schema:
-            type: string
-            format: uuid
-        - in: query
-          name: tournament_id
+          name: participant_id
           schema:
             type: string
             format: uuid
@@ -111,10 +101,111 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/MatchSummary'
+                  $ref: '#/components/schemas/MatchRecord'
 
 components:
   schemas:
+    # Как обсудили, передаем турниры по айди
+    BatchMatchStatsRequest:
+      type: object
+      required:
+        - tournamentId
+        - sport
+        - matches
+      properties:
+        tournamentId:
+          type: string
+          format: uuid
+        sport:
+          type: string
+          enum: [football, boxing, basketball, chess, tennis, jiu_jitsu]
+        matches:
+          type: array
+          items:
+            $ref: '#/components/schemas/MatchStatRecord'
+    
+    # (?) нужно будет передавать один и тот же матч со всеми игроками по очереди, чтобы отслеживать индивидуальную статистику по игрокам/командам.
+    # В целом этого достаточно, чтобы удовлетворить всем
+    # гет запросам(но это чисто мвп, на следующих спринтах нужно будет как-то расширить функционал хз...) 
+    MatchStatRecord:
+      type: object
+      required:
+        - matchId
+        - participantId
+        - participantType
+        - points
+        - isWinner
+      properties:
+        matchId:
+          type: string
+          format: uuid
+        participantId:
+          type: string
+          format: uuid
+        participantType:
+          type: string
+          enum: [player, team]
+        points:
+          type: integer
+        isWinner:
+          type: boolean
+
+      
+      
+        # Опциональные дополнительные метрики(могут дополняться/изменяться), поддерживают null:
+        goals:
+          type: integer
+          description: Количество голов (football, hockey)
+          nullable: true
+        assists:
+          type: integer
+          description: Передачи с результативным действием
+          nullable: true
+        fouls:
+          type: integer
+          description: Количество фолов (football, basketball и т.п.)
+          nullable: true
+        yellowCards:
+          type: integer
+          nullable: true
+        redCards:
+          type: integer
+          nullable: true
+        knockdowns:
+          type: integer
+          description: Для боевых видов спорта (boxing, mma)
+          nullable: true
+        submissions:
+          type: integer
+          description: Завершение поединка сдачей (jiu_jitsu)
+          nullable: true
+        setsWon:
+          type: integer
+          description: Для тенниса или настольного тенниса
+          nullable: true
+        timePlayed:
+          type: number
+          format: float
+          description: Время, проведённое на площадке (в минутах)
+          nullable: true
+
+    
+
+    MatchRecord:
+      type: object
+      properties:
+        matchId:
+          type: string
+          format: uuid
+        participantId:
+          type: string
+          format: uuid
+        participantType:
+          type: string
+        points:
+          type: integer
+        isWinner:
+          type: boolean
 
     PlayerStats:
       type: object
@@ -147,63 +238,3 @@ components:
           format: float
         totalWins:
           type: integer
-
-    MatchSummary:
-      type: object
-      properties:
-        matchId:
-          type: string
-          format: uuid
-        startedAt:
-          type: string
-          format: date-time
-        endedAt:
-          type: string
-          format: date-time
-        sport:
-          type: string
-        participants:
-          type: array
-          items:
-            $ref: '#/components/schemas/MatchParticipant'
-
-    ExtendedMatchResult:
-      type: object
-      properties:
-        matchId:
-          type: string
-          format: uuid
-        tournamentId:
-          type: string
-          format: uuid
-        tournamentTitle:
-          type: string
-        sport:
-          type: string
-          enum: [football, boxing, basketball, chess, tennis, jiu_jitsu]
-        startedAt:
-          type: string
-          format: date-time
-        endedAt:
-          type: string
-          format: date-time
-        participants:
-          type: array
-          items:
-            $ref: '#/components/schemas/MatchParticipant'
-
-    MatchParticipant:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        type:
-          type: string
-          enum: [player, team]
-        name:
-          type: string
-        points:
-          type: integer
-        isWinner:
-          type: boolean
