@@ -1,10 +1,11 @@
 openapi: 3.0.3
 info:
   title: StatisticsService API
-  version: 1.0.0
-  description: >
-    MVP версия сервиса статистики. Обеспечивает приём данных матчей,
-    индивидуальную и командную статистику, историю матчей и топ игроков.
+  version: 1.1.0
+  description: |
+    Расширенный MVP-контракт StatisticsService. Поддерживает приём результатов матчей
+    по турниру с вложенными участниками, индивидуальную и командную статистику,
+    историю матчей и топ игроков.
 
 servers:
   - url: http://localhost:8081/api/v1
@@ -12,16 +13,16 @@ servers:
 paths:
   /stats/update:
     post:
-      summary: Массовая передача результатов матчей
+      summary: Загрузка результатов матчей по турниру
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BatchMatchStatsRequest'
+              $ref: '#/components/schemas/TournamentMatchStatsRequest'
       responses:
         '200':
-          description: Данные успешно сохранены
+          description: Данные успешно приняты
 
   /stats/player/{userId}:
     get:
@@ -105,8 +106,7 @@ paths:
 
 components:
   schemas:
-    # Как обсудили, передаем турниры по айди
-    BatchMatchStatsRequest:
+    TournamentMatchStatsRequest:
       type: object
       required:
         - tournamentId
@@ -122,23 +122,30 @@ components:
         matches:
           type: array
           items:
-            $ref: '#/components/schemas/MatchStatRecord'
-    
-    # (?) нужно будет передавать один и тот же матч со всеми игроками по очереди, чтобы отслеживать индивидуальную статистику по игрокам/командам.
-    # В целом этого достаточно, чтобы удовлетворить всем
-    # гет запросам(но это чисто мвп, на следующих спринтах нужно будет как-то расширить функционал хз...) 
-    MatchStatRecord:
+            $ref: '#/components/schemas/MatchWithParticipants'
+
+    MatchWithParticipants:
       type: object
       required:
         - matchId
+        - participants
+      properties:
+        matchId:
+          type: string
+          format: uuid
+        participants:
+          type: array
+          items:
+            $ref: '#/components/schemas/MatchParticipantStats'
+
+    MatchParticipantStats:
+      type: object
+      required:
         - participantId
         - participantType
         - points
         - isWinner
       properties:
-        matchId:
-          type: string
-          format: uuid
         participantId:
           type: string
           format: uuid
@@ -149,21 +156,14 @@ components:
           type: integer
         isWinner:
           type: boolean
-
-      
-      
-        # Опциональные дополнительные метрики(могут дополняться/изменяться), поддерживают null:
         goals:
           type: integer
-          description: Количество голов (football, hockey)
           nullable: true
         assists:
           type: integer
-          description: Передачи с результативным действием
           nullable: true
         fouls:
           type: integer
-          description: Количество фолов (football, basketball и т.п.)
           nullable: true
         yellowCards:
           type: integer
@@ -173,39 +173,17 @@ components:
           nullable: true
         knockdowns:
           type: integer
-          description: Для боевых видов спорта (boxing, mma)
           nullable: true
         submissions:
           type: integer
-          description: Завершение поединка сдачей (jiu_jitsu)
           nullable: true
         setsWon:
           type: integer
-          description: Для тенниса или настольного тенниса
           nullable: true
         timePlayed:
           type: number
           format: float
-          description: Время, проведённое на площадке (в минутах)
           nullable: true
-
-    
-
-    MatchRecord:
-      type: object
-      properties:
-        matchId:
-          type: string
-          format: uuid
-        participantId:
-          type: string
-          format: uuid
-        participantType:
-          type: string
-        points:
-          type: integer
-        isWinner:
-          type: boolean
 
     PlayerStats:
       type: object
@@ -238,3 +216,19 @@ components:
           format: float
         totalWins:
           type: integer
+
+    MatchRecord:
+      type: object
+      properties:
+        matchId:
+          type: string
+          format: uuid
+        participantId:
+          type: string
+          format: uuid
+        participantType:
+          type: string
+        points:
+          type: integer
+        isWinner:
+          type: boolean
