@@ -1,11 +1,12 @@
 openapi: 3.0.3
 info:
   title: StatisticsService API
-  version: 1.1.0
+  version: 1.0.0
   description: |
     Расширенный MVP-контракт StatisticsService. Поддерживает приём результатов матчей
     по турниру с вложенными участниками, индивидуальную и командную статистику,
-    историю матчей и топ игроков.
+    историю матчей и топ игроков. Добавлены query-параметры для фильтрации по виду спорта,
+    а также поле tournamentType в POST (пока не используется).
 
 servers:
   - url: http://localhost:8081/api/v1
@@ -34,6 +35,12 @@ paths:
           schema:
             type: string
             format: uuid
+        - in: query
+          name: sport
+          required: true
+          schema:
+            type: string
+            enum: [football, boxing, basketball, chess, tennis, jiu_jitsu]
       responses:
         '200':
           description: Статистика игрока
@@ -52,6 +59,12 @@ paths:
           schema:
             type: string
             format: uuid
+        - in: query
+          name: sport
+          required: true
+          schema:
+            type: string
+            enum: [football, boxing, basketball, chess, tennis, jiu_jitsu]
       responses:
         '200':
           description: Статистика команды
@@ -91,6 +104,7 @@ paths:
             format: uuid
         - in: query
           name: sport
+          required: true
           schema:
             type: string
             enum: [football, boxing, basketball, chess, tennis, jiu_jitsu]
@@ -111,6 +125,7 @@ components:
       required:
         - tournamentId
         - sport
+        - tournamentType
         - matches
       properties:
         tournamentId:
@@ -119,6 +134,9 @@ components:
         sport:
           type: string
           enum: [football, boxing, basketball, chess, tennis, jiu_jitsu]
+        tournamentType:
+          type: string
+          enum: [round_robin, single_elimination, double_elimination, group_stage]
         matches:
           type: array
           items:
@@ -232,3 +250,4 @@ components:
           type: integer
         isWinner:
           type: boolean
+
