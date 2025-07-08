@@ -8,8 +8,8 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/statistics_db
     driver-class-name: org.postgresql.Driver
-    username: postgres
-    password: wastedQ123
+    username: YOUR_USERNAME
+    password: YOUR_PASSWORD
 
   
   jpa:
