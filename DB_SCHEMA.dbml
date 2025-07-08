@@ -1,0 +1,35 @@
+Table matches {
+  id UUID [pk]
+  match_id UUID [not null]
+  tournament_id UUID [not null]
+  sport varchar(50) [not null]
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+
+  Indexes {
+    (sport) [name: "idx_matches_sport"]
+    (tournament_id) [name: "idx_matches_tournament"]
+  }
+}
+
+Table match_participants {
+  id UUID [pk]
+  match_id UUID [not null, ref: > matches.id]
+  participant_id UUID [not null]
+  participant_type varchar(20) [not null]
+  points int [default: 0]
+  is_winner boolean [default: false]
+  goals int [default: 0]
+  assists int [default: 0]
+  fouls int [default: 0]
+  yellow_cards int [default: 0]
+  red_cards int [default: 0]
+  time_played int [default: 0]
+  sets_won int [default: 0]
+  submissions int [default: 0]
+  knockdowns int [default: 0]
+
+  Indexes {
+    (participant_id) [name: "idx_participants_participant_id"]
+    (participant_type) [name: "idx_participants_type"]
+  }
+}
