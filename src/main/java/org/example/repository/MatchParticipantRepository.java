@@ -25,8 +25,7 @@ public interface MatchParticipantRepository extends JpaRepository<MatchParticipa
                                                               @Param("participantType") ParticipantType participantType,
                                                               @Param("sport") Sport sport);
     
-    @Query("SELECT mp FROM MatchParticipant mp JOIN mp.match m WHERE mp.participantType = 'player' " +
-           "AND m.sport = :sport ORDER BY mp.points DESC")
+    @Query("SELECT mp FROM MatchParticipant mp JOIN mp.match m WHERE m.sport = :sport ORDER BY mp.points DESC")
     List<MatchParticipant> findTopPlayersBySport(@Param("sport") Sport sport);
     
     @Query("SELECT mp FROM MatchParticipant mp WHERE mp.match.matchId = :matchId")
