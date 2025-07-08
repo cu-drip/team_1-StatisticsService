@@ -74,7 +74,7 @@ http://localhost:8081
 ### Получить статистику команды
 **GET** `/api/v1/stats/team/{teamId}?sport=football`
 
-### Топ игроков
+### Топ 5 игроков/команд по виду спорта
 **GET** `/api/v1/stats/top/players?sport=football`
 
 ### История матчей
