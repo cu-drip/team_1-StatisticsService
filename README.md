@@ -26,7 +26,7 @@ docker-compose build
 docker-compose up -d
 ```
 (Также нужно будет создать таблицы по sql скрипту из файла StatisticsServiceDB.sql, либо же hibernate автоматически создаст нужные таблицы и индексы при запуске приложения, если в файле application.yml в jpa: hibernate: ddl-auto: вместо none поставить параметр update(пока не рекомендуется))
-(В файле docker-compose.yml поменять данные на свои и аналогично в файле application.yml в папке recourses)
+(В файле docker-compose.yml поменять данные на свои и аналогично в файле application.yml в папке resources)
 
 ### 2. API доступен по адресу
 ```
