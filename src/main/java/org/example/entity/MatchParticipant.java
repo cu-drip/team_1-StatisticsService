@@ -5,8 +5,13 @@ import org.example.model.ParticipantType;
 
 import java.util.UUID;
 
+
 @Entity
-@Table(name = "match_participants")
+@Table(name = "match_participants",
+       indexes = {
+           @Index(name = "idx_participants_participant_id", columnList = "participant_id"),
+           @Index(name = "idx_participants_type", columnList = "participant_type")
+       })
 public class MatchParticipant {
     
     @Id
