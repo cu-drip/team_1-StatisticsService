@@ -22,8 +22,10 @@ paths:
             schema:
               $ref: '#/components/schemas/TournamentMatchStatsRequest'
       responses:
-        '200':
+        '201':
           description: Данные успешно приняты
+        '400':
+          description: Ошибка в формате запроса *описание ошибки зависит от введенных данных в запросе*
 
   /stats/player/{userId}:
     get:
@@ -48,6 +50,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PlayerStats'
+        '404':
+          description: Ресурс не найден *описание ошибки зависит от введенных данных в запросе*
 
   /stats/team/{teamId}:
     get:
@@ -72,6 +76,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TeamStats'
+        '404':
+          description: Ресурс не найден *описание ошибки зависит от введенных данных в запросе*
 
   /stats/top/players:
     get:
@@ -92,6 +98,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PlayerStats'
+        '404':
+          description: Ресурс не найден *описание ошибки зависит от введенных данных в запросе*
 
   /stats/matches/history:
     get:
@@ -117,6 +125,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MatchRecord'
+        '404':
+          description: Ресурс не найден *описание ошибки зависит от введенных данных в запросе*
 
 components:
   schemas:
@@ -248,6 +258,3 @@ components:
           type: string
         points:
           type: integer
-        isWinner:
-          type: boolean
-
