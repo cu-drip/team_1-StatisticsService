@@ -81,7 +81,7 @@ paths:
 
   /stats/top/players:
     get:
-      summary: Получить топ-5 игроков по очкам
+      summary: Получить топ-5 игроков/команд(определяется видом спорта) по очкам
       parameters:
         - in: query
           name: sport
