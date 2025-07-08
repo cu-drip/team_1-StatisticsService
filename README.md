@@ -25,6 +25,7 @@ mvn clean package -DskipTests
 docker-compose build
 docker-compose up -d
 ```
+(Также нужно будет создать таблицы по sql скрипту из файла StatisticsServiceDB.sql)
 
 ### 2. API доступен по адресу
 ```
