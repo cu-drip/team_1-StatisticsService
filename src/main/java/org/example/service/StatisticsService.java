@@ -29,9 +29,11 @@ public class StatisticsService {
         List<UUID> matchIds = request.getMatches().stream()
             .map(MatchWithParticipants::getMatchId)
             .collect(Collectors.toList());
-        Set<UUID> uniqueMatchIds = new HashSet<>(matchIds);
-        if (uniqueMatchIds.size() < matchIds.size()) {
-            throw new IllegalArgumentException("В запросе есть матчи с одинаковыми matchId");
+        List<UUID> existingMatchIds = matchIds.stream()
+            .filter(id -> matchRepository.findByMatchId(id).isPresent())
+            .collect(Collectors.toList());
+        if (!existingMatchIds.isEmpty()) {
+            throw new IllegalArgumentException("В базе уже существуют матчи с matchId: " + existingMatchIds);
         }
         for (MatchWithParticipants matchData : request.getMatches()) {
             // Проверяем, есть ли уже матч с таким matchId
