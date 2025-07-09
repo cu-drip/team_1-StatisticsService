@@ -41,4 +41,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleInvalidFormat(HttpMessageNotReadableException ex) {
         return ResponseEntity.badRequest().body("Ошибка в формате запроса: " + ex.getMostSpecificCause().getMessage());
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgument(IllegalArgumentException ex) {
+        return ResponseEntity.badRequest().body("Ошибка в запросе: " + ex.getMessage());
+    }
 } 
