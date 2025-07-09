@@ -130,14 +130,14 @@ public class StatisticsService {
             topPlayers.add(new PlayerStats(userId, totalGames, totalPoints, averagePoints, totalWins));
         }
         
-        // Сортируем по общему количеству очков, затем по количеству побед и берем топ-5
-        return topPlayers.stream()
-            .sorted(Comparator
-                .comparingInt(PlayerStats::getTotalPoints).reversed()
-                .thenComparingInt(PlayerStats::getTotalWins).reversed()
+        List<PlayerStats> sortedTop = topPlayers.stream()
+            .sorted(
+                Comparator.comparingInt(PlayerStats::getTotalPoints).reversed()
+                    .thenComparing(Comparator.comparingInt(PlayerStats::getTotalWins).reversed())
             )
             .limit(5)
             .collect(Collectors.toList());
+        return sortedTop;
     }
     
     public List<MatchRecord> getMatchHistory(Sport sport, UUID participantId) {
