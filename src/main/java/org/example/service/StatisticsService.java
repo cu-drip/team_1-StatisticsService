@@ -26,6 +26,13 @@ public class StatisticsService {
     private MatchParticipantRepository matchParticipantRepository;
     
     public void updateTournamentStats(TournamentMatchStatsRequest request) {
+        List<UUID> matchIds = request.getMatches().stream()
+            .map(MatchWithParticipants::getMatchId)
+            .collect(Collectors.toList());
+        Set<UUID> uniqueMatchIds = new HashSet<>(matchIds);
+        if (uniqueMatchIds.size() < matchIds.size()) {
+            throw new IllegalArgumentException("В запросе есть матчи с одинаковыми matchId");
+        }
         for (MatchWithParticipants matchData : request.getMatches()) {
             // Проверяем, есть ли уже матч с таким matchId
             Match match = matchRepository.findByMatchId(matchData.getMatchId())
