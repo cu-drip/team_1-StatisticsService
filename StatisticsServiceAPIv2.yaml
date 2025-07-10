@@ -1,11 +1,12 @@
 openapi: 3.0.3
 info:
   title: StatisticsService API
-  version: 1.1.0
+  version: 1.2.0
   description: |
     Обновлённый контракт StatisticsService. Удалена история матчей, добавлен эндпоинт получения матчей по турниру,
-    обновлены ответы на GET-запросы (200 с пустым телом вместо 404), добавлены параметры для фильтрации по n турнирам/матчам
-    и возможность получения статистики по всем видам спорта.
+    обновлены ответы на GET-запросы (200 с пустым телом вместо 404), добавлены параметры для фильтрации по n турнирам/матчам,
+    возможность получения статистики игрока/команды по всем видам спорта, по матчам и по турнирам,
+    а также параметр количества игроков в топе (по умолчанию 5).
 
 servers:
   - url: http://localhost:8081/api/v1
@@ -54,6 +55,18 @@ paths:
           schema:
             type: integer
             minimum: 1
+        - in: query
+          name: tournament_id
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: match_id
+          required: false
+          schema:
+            type: string
+            format: uuid
       responses:
         '200':
           description: Статистика игрока (или пустой объект если не найдено)
@@ -90,6 +103,18 @@ paths:
           schema:
             type: integer
             minimum: 1
+        - in: query
+          name: tournament_id
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: match_id
+          required: false
+          schema:
+            type: string
+            format: uuid
       responses:
         '200':
           description: Статистика команды (или пустой объект если не найдено)
@@ -100,7 +125,7 @@ paths:
 
   /stats/top/players:
     get:
-      summary: Получить топ-5 игроков/команд (определяется видом спорта) по очкам
+      summary: Получить топ-N игроков/команд (по очкам)
       parameters:
         - in: query
           name: sport
@@ -108,6 +133,13 @@ paths:
           schema:
             type: string
             enum: [football, boxing, basketball, chess, tennis, jiu_jitsu]
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: integer
+            default: 5
+            minimum: 1
       responses:
         '200':
           description: Список топ-игроков
@@ -254,3 +286,4 @@ components:
           format: float
         totalWins:
           type: integer
+
