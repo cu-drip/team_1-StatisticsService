@@ -5,7 +5,6 @@ import org.example.model.ParticipantType;
 
 import java.util.UUID;
 
-
 @Entity
 @Table(name = "match_participants",
        indexes = {
