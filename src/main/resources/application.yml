@@ -6,7 +6,7 @@ spring:
     name: statistics-service
   
   datasource:
-    url: jdbc:postgresql://db:5432/statistics_db
+    url: jdbc:postgresql://statisticservicedb:5432/statistics_db
     driver-class-name: org.postgresql.Driver
     username: postgres
     password: wastedQ123
