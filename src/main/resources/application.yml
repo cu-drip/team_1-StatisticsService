@@ -6,10 +6,10 @@ spring:
     name: statistics-service
   
   datasource:
-    url: jdbc:postgresql://statisticservicedb:5432/statistics_db
+    url: $(SPRING_ DATASOURCE_URL}
     driver-class-name: org.postgresql.Driver
-    username: postgres
-    password: wastedQ123
+    username: $(SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
 
   
   jpa:
