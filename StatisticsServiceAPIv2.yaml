@@ -1,0 +1,369 @@
+openapi: 3.0.3
+info:
+  title: Statistics Service API
+  version: 1.0.0
+paths:
+  /api/v1/stats/update:
+    post:
+      summary: Загрузить статистику матчей турнира
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TournamentMatchStatsRequest'
+      responses:
+        '200':
+          description: Данные успешно приняты
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /api/v1/stats/player/{userId}:
+    get:
+      summary: Получить статистику игрока
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: sport
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/Sport'
+        - name: last_matches
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: last_tournaments
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: tournament_id
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: match_id
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Статистика игрока
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/PlayerStats'
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/PlayerStats'
+
+  /api/v1/stats/team/{teamId}:
+    get:
+      summary: Получить статистику команды
+      parameters:
+        - name: teamId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: sport
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/Sport'
+        - name: last_matches
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: last_tournaments
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: tournament_id
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: match_id
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Статистика команды
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/TeamStats'
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/TeamStats'
+
+  /api/v1/stats/top/players:
+    get:
+      summary: Топ-N игроков по виду спорта
+      parameters:
+        - name: sport
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/Sport'
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 5
+        - name: tournament_id
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Топ игроков
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PlayerStats'
+
+  /api/v1/stats/top/teams:
+    get:
+      summary: Топ-N команд по виду спорта
+      parameters:
+        - name: sport
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/Sport'
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 5
+        - name: tournament_id
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Топ команд
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TeamStats'
+
+  /api/v1/stats/tournament/{tournamentId}/matches:
+    get:
+      summary: Получить матчи турнира с участниками
+      parameters:
+        - name: tournamentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Список матчей с участниками
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MatchWithParticipants'
+
+  /api/v1/stats/match/{matchId}:
+    get:
+      summary: Получить участников и их показатели по матчу
+      parameters:
+        - name: matchId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Участники и их показатели по матчу
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatchWithParticipants'
+
+components:
+  schemas:
+    PlayerStats:
+      type: object
+      properties:
+        userId:
+          type: string
+          format: uuid
+        sport:
+          $ref: '#/components/schemas/Sport'
+        totalGames:
+          type: integer
+        totalPoints:
+          type: integer
+        averagePoints:
+          type: number
+          format: float
+        totalWins:
+          type: integer
+        totalDraws:
+          type: integer
+        totalLosses:
+          type: integer
+        winRate:
+          type: integer
+          nullable: true
+          description: Винрейт по виду спорта, % (0–100)
+        assists:
+          type: integer
+        fouls:
+          type: integer
+        yellowCards:
+          type: integer
+        redCards:
+          type: integer
+        setsWon:
+          type: integer
+        submissions:
+          type: integer
+        knockdowns:
+          type: integer
+        timePlayed:
+          type: number
+          format: float
+    TeamStats:
+      type: object
+      properties:
+        teamId:
+          type: string
+          format: uuid
+        sport:
+          $ref: '#/components/schemas/Sport'
+        totalGames:
+          type: integer
+        totalPoints:
+          type: integer
+        averagePoints:
+          type: number
+          format: float
+        totalWins:
+          type: integer
+        totalDraws:
+          type: integer
+        totalLosses:
+          type: integer
+        winRate:
+          type: integer
+          nullable: true
+          description: Винрейт по виду спорта, % (0–100)
+        assists:
+          type: integer
+        fouls:
+          type: integer
+        yellowCards:
+          type: integer
+        redCards:
+          type: integer
+        setsWon:
+          type: integer
+        submissions:
+          type: integer
+        knockdowns:
+          type: integer
+        timePlayed:
+          type: number
+          format: float
+    MatchWithParticipants:
+      type: object
+      properties:
+        matchId:
+          type: string
+          format: uuid
+        participants:
+          type: array
+          items:
+            $ref: '#/components/schemas/MatchParticipantStats'
+    MatchParticipantStats:
+      type: object
+      properties:
+        participantId:
+          type: string
+          format: uuid
+        participantType:
+          type: string
+          enum: [player, team]
+        points:
+          type: integer
+        isWinner:
+          type: boolean
+        goals:
+          type: integer
+        assists:
+          type: integer
+        fouls:
+          type: integer
+        yellowCards:
+          type: integer
+        redCards:
+          type: integer
+        knockdowns:
+          type: integer
+        submissions:
+          type: integer
+        setsWon:
+          type: integer
+        timePlayed:
+          type: number
+          format: float
+    TournamentMatchStatsRequest:
+      type: object
+      properties:
+        tournamentId:
+          type: string
+          format: uuid
+        sport:
+          $ref: '#/components/schemas/Sport'
+        tournamentType:
+          $ref: '#/components/schemas/TournamentType'
+        matches:
+          type: array
+          items:
+            $ref: '#/components/schemas/MatchWithParticipants'
+    Sport:
+      type: string
+      enum: [football, basketball, tennis, jiu_jitsu, chess, boxing]
+    TournamentType:
+      type: string
+      enum: [olympic, swiss, round_robin] 
+
