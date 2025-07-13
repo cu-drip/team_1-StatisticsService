@@ -16,6 +16,7 @@ services:
       - microservices-net   # ← добавили
 
   statisticservice:
+    container_name: statisticservice
     build: .
     depends_on:
       - statisticservicedb
