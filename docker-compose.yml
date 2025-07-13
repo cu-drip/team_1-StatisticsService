@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  db:
+  statisticservicedb:
     image: postgres:15
     restart: always
     environment:
@@ -11,14 +11,14 @@ services:
     ports:
       - "5433:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - statisticservicepgdata:/var/lib/postgresql/data
     networks:
       - microservices-net   # ← добавили
 
-  app:
+  statisticservice:
     build: .
     depends_on:
-      - db
+      - statisticservicedb
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/statistics_db
       SPRING_DATASOURCE_USERNAME: YOUR_POSTGRES_USER
@@ -31,7 +31,7 @@ services:
       - microservices-net   # ← добавили
 
 volumes:
-  pgdata:
+  statisticservicepgdata:
 
 networks:
   microservices-net:              # ← перезаписываем standard default
