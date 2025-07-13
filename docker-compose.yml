@@ -20,7 +20,7 @@ services:
     depends_on:
       - statisticservicedb
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/statistics_db
+      SPRING_DATASOURCE_URL: jdbc:postgresql://statisticservicedb:5432/statistics_db
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: wastedQ123
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
