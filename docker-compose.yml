@@ -12,6 +12,8 @@ services:
       - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    networks:
+      - microservices-net   # ← добавили
 
   app:
     build: .
@@ -21,10 +23,16 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/statistics_db
       SPRING_DATASOURCE_USERNAME: YOUR_POSTGRES_USER
       SPRING_DATASOURCE_PASSWORD: YOUR_POSTGRES_PASSWORD
-      SPRING_JPA_HIBERNATE_DDL_AUTO: none
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
     ports:
-      - "8081:8081"
+      - "8081:8080"
     restart: always
+    networks:
+      - microservices-net   # ← добавили
 
 volumes:
   pgdata:
+
+networks:
+  microservices-net:              # ← перезаписываем standard default
+    external: true
